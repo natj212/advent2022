@@ -16,6 +16,6 @@ countTrue [] = 0
 countTrue (x:xs) = if x then 1 + countTrue xs else countTrue xs
 
 main = do
-  contents <- readFile "day2test.txt"
+  contents <- readFile "day2a.txt"
   print $ countTrue $ map checkBoth $ parseNums $ contents
 
