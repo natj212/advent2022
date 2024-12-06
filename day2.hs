@@ -3,7 +3,8 @@ checkDescending2 [] post happened = checkDescending2 [head post] (tail post) hap
 checkDescending2 _ [] happened = True
 checkDescending2 pre post happened
   | diffBool  = checkDescending2 (pre ++ [head post]) (tail post) happened
-  | not diffBool && not happened = (checkDescending2 pre (tail post) True) || (checkDescending2 (init pre) post True)
+  | not diffBool && not happened = (checkDescending2 pre (tail post) True) ||
+    (checkDescending2 (init pre) post True)
   | otherwise = False
     where diff = (head post) - (last pre)
           diffBool = (diff > 0) && (diff <= 3)
