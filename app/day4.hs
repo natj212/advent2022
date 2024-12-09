@@ -1,7 +1,5 @@
 module Main where
 import Data.Vector(Vector,fromList,(!?),(!))
--- data Pos = Pos {x::Int,
---                 y::Int} deriving (Show)
 
 getElem :: (Int,Int) -> Vector (Vector Char) -> Maybe Char
 getElem (x,y) array = do
@@ -20,12 +18,32 @@ checkXmas point array = let directions = [(x,y) | x<- [-1..1], y<- [-1..1] ]
                                $ fmap (\x -> arrayLine point x 4 array) directions
 
 
-getXmasCount :: Vector (Vector Char) -> Int
-getXmasCount array = let coors = [(y,x) | x<-[0..length array], y<-[0..length (array ! 0)]]
-                         coors2 = filter (\x-> getElem x array == Just 'X') coors
-                               in foldr (+) 0 $ map (\x -> checkXmas x array) coors2
+getGenericCount ::  Char -> ((Int,Int) -> Vector (Vector Char) -> Int) -> Vector (Vector Char) -> Int
+getGenericCount c func array = let coors = [(y,x) | x<-[0..length array], y<-[0..length (array ! 0)]]
+                                   coors2 = filter (\x-> getElem x array == Just c) coors
+                               in foldr (+) 0 $ map (\x -> func x array) coors2
+
+add :: (Int, Int) -> (Int, Int) -> (Int, Int)
+add (x, y) (u, v) = (x+u, y+v)
+
+rotateStr :: String -> String
+rotateStr str = (last str:init str)
+
+checkMMSS :: String -> Bool
+checkMMSS str = length (filter (=="MMSS") $ take 4 $ iterate rotateStr str) /= 0
+
+checkMas :: (Int,Int) -> Vector (Vector Char) -> Bool
+checkMas pos array
+  | getElem pos array == Just 'A' = Just True ==  do
+      str <- sequence $ fmap (\x-> getElem (add x pos) array) dirs
+      Just $ checkMMSS str
+  | otherwise = False
+  where dirs = [(-1,-1),(-1,1),(1,1),(1,-1)]
+
 
 main :: IO ()
 main = do
   content <- readFile "day4a.txt"
-  print $ getXmasCount $ fromList $ fmap fromList $ lines $ content
+  array <- return $ fromList $ fmap fromList $ lines $ content
+  print $ (getGenericCount 'X' checkXmas)  $ array
+  print $ (getGenericCount 'A' (\x y-> if checkMas x y then 1 else 0)) $ array
